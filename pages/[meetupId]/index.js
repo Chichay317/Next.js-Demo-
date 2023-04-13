@@ -21,7 +21,7 @@ function MeetupDetails(props) {
   );
 }
 
-// getStaticPaths is also used in a page component file like getStaticProps and getServerSideProps. it is used in dynamic files with getStaticProps(not getServerSideProps). here, we define all the specific meetupIds for which this page should be pre-generated. the fallback key tells Next.js whether your paths array contains all supported parameter values or just some and setting it to false means that your path contains all, setting it to true will allow next.js to dynamically pregenerate some parameter values as requests are coming in. fallback allows you to pregenerate some of your pages for some specific meetupIds(e.g pages visited frequently)
+// getStaticPaths is also used in a page component file like getStaticProps and getServerSideProps. it is used in dynamic files with getStaticProps(not getServerSideProps). here, we define all the specific meetupIds for which this page should be pre-generated. the fallback key tells Next.js whether your paths array contains all supported parameter values or just some and setting it to false means that your path contains all, setting it to true or 'blocking' will allow next.js to dynamically pregenerate some parameter values as requests are coming in. the difference between true and blocking is that true will first return an empty page then pull the dynamically generated content (you'll need to handle that case where the data is not there yet) while blocking will not return anything till the data comes in. fallback allows you to pregenerate some of your pages for some specific meetupIds(e.g pages visited frequently)
 export async function getStaticPaths() {
   const client = await MongoClient.connect(
     "mongodb+srv://CodeDeev:Chichay317@cluster0.mqk4lzr.mongodb.net/meetups?retryWrites=true&w=majority"
@@ -35,7 +35,7 @@ export async function getStaticPaths() {
   client.close();
 
   return {
-    fallback: false,
+    fallback: "blocking",
     paths: meetups.map((meetup) => ({
       params: { meetupId: meetup._id.toString() },
     })),
